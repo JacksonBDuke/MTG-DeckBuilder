@@ -106,7 +106,9 @@ public class MTG_TTS_DeckBuilder extends Application implements EventHandler<Act
         
         Button button_GrabClipboard = new Button("Grab from Clipboard");
         Button button_AddToDeck = new Button("Add Card to Deck");
+        button_AddToDeck.setDisable(true);
         Button button_Export = new Button("Export");
+        button_Export.setDisable(true);
         Button button_PreviousCard = new Button("Previous Card");
         Button button_NextCard = new Button("Next Card");
         
@@ -114,8 +116,16 @@ public class MTG_TTS_DeckBuilder extends Application implements EventHandler<Act
             System.out.println("Grabbing image...");
             cardImage = grabImage();
             System.out.println("Got image.");
-
-            ivCurrent.setImage(cardImage);
+            
+            if(cardImage != null){
+                ivCurrent.setImage(cardImage);
+                makeButtonActive(button_AddToDeck);
+            }
+            
+            else{
+                makeButtonInactive(button_AddToDeck);
+            }
+            
         });
         
         
@@ -128,6 +138,9 @@ public class MTG_TTS_DeckBuilder extends Application implements EventHandler<Act
                 ivCurrent.setImage(null);
                 cardCounter.setText("Cards Added: " + imageList.size());
                 cardImage = null;
+            }
+            if(button_Export.isDisable()){
+                makeButtonActive(button_Export);
             }
         });
         
@@ -212,6 +225,18 @@ public class MTG_TTS_DeckBuilder extends Application implements EventHandler<Act
         window.setTitle("MTG TTS Deck Image Generator");
         window.show();
         
+    }
+    
+    public void makeButtonInactive(Button b){
+        if(!b.isDisable()){
+            b.setDisable(true);
+        }
+    }
+    
+    public void makeButtonActive(Button b){
+        if(b.isDisable()){
+            b.setDisable(false);
+        }
     }
     
     @Override
