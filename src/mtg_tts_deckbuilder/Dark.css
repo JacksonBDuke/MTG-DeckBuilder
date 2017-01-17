@@ -1,0 +1,18 @@
+.root{
+    -fx-font-size: 16pt;
+    -fx-font-family: "Century Gothic";
+    -fx-background-color: #212121;
+    -fx-color: #FEFEFE;
+    -fx-text-fill: #FEFEFE;
+    -fx-text-alignment: center;
+}
+
+.button{
+    -fx-background-color: #FEFEFE;
+    -fx-border-color: #212121;
+    -fx-text-fill: #212121;
+}
+
+.vbox{
+    -fx-border-color:#FEFEFE;
+}
