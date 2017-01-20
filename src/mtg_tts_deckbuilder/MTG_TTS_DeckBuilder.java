@@ -28,6 +28,7 @@ import javafx.geometry.Pos;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.TextField;
 import javafx.scene.text.Text;
 import javafx.scene.image.WritableImage;
 import javafx.scene.input.KeyCode;
@@ -47,6 +48,7 @@ public class MTG_TTS_DeckBuilder extends Application implements EventHandler<Act
     ImageView ivCurrent;
     ImageView ivPrevious;
     ImageView ivPrevious2;
+    TextField tvDeckName;
     ArrayList<Image> imageList = new ArrayList();
     Button button;
     Stage window;
@@ -66,6 +68,7 @@ public class MTG_TTS_DeckBuilder extends Application implements EventHandler<Act
     
     @Override
     public void start(Stage primaryStage) throws Exception {
+        
         //window.setOnCloseRequest(e -> closeProgram());
         window = primaryStage;
         
@@ -76,7 +79,10 @@ public class MTG_TTS_DeckBuilder extends Application implements EventHandler<Act
         ivCurrent = new ImageView();
         ivPrevious = new ImageView();
         ivPrevious2 = new ImageView();
+        tvDeckName = new TextField();
+        
         Text cardCounter = new Text("No cards added");
+        
         cardCounter.setFill(Color.web("#FEFEFE"));
         
         ivCurrent.setFitWidth(312);
@@ -90,7 +96,7 @@ public class MTG_TTS_DeckBuilder extends Application implements EventHandler<Act
         //ivPrevious.setPreserveRatio(false);
         //ivPrevious.setFitWidth(234);
         //ivPrevious.setFitHeight(367);
-        ivPrevious.setPreserveRatio(true);
+        ivPrevious.setPreserveRatio(false);
         ivPrevious.setSmooth(true);
         ivPrevious.setCache(true);
         
@@ -98,7 +104,7 @@ public class MTG_TTS_DeckBuilder extends Application implements EventHandler<Act
         ivPrevious2.setFitHeight(445);
         //ivPrevious2.setFitWidth(156);
         //ivPrevious2.setFitHeight(289);
-        ivPrevious2.setPreserveRatio(true);
+        ivPrevious2.setPreserveRatio(false);
         ivPrevious2.setSmooth(true);
         ivPrevious2.setCache(true);
         
@@ -119,11 +125,11 @@ public class MTG_TTS_DeckBuilder extends Application implements EventHandler<Act
             
             if(cardImage != null){
                 ivCurrent.setImage(cardImage);
-                makeButtonActive(button_AddToDeck);
+                makeNodeActive(button_AddToDeck);
             }
             
             else{
-                makeButtonInactive(button_AddToDeck);
+                makeNodeInactive(button_AddToDeck);
             }
             
         });
@@ -131,8 +137,8 @@ public class MTG_TTS_DeckBuilder extends Application implements EventHandler<Act
         
         button_AddToDeck.setOnAction(e ->{
             if(cardImage != null){
+                addImage(ivCurrent);
                 System.out.println("Added image to list");
-                imageList.add(cardImage);
                 ivPrevious2.setImage(ivPrevious.getImage());
                 ivPrevious.setImage(ivCurrent.getImage());
                 ivCurrent.setImage(null);
@@ -140,7 +146,7 @@ public class MTG_TTS_DeckBuilder extends Application implements EventHandler<Act
                 cardImage = null;
             }
             if(button_Export.isDisable()){
-                makeButtonActive(button_Export);
+                makeNodeActive(button_Export);
             }
         });
         
@@ -159,7 +165,7 @@ public class MTG_TTS_DeckBuilder extends Application implements EventHandler<Act
             
         });
         
-        HBox topMenu = new HBox();
+        VBox topMenu = new VBox();
         HBox bottomMenu = new HBox();
         HBox centerContent = new HBox();
         
@@ -190,10 +196,16 @@ public class MTG_TTS_DeckBuilder extends Application implements EventHandler<Act
         VBox leftMenu = new VBox();
         VBox rightMenu = new VBox();
         
+        //topMenu.getChildren().addAll(tvDeckName, cardCounter);
         topMenu.getChildren().addAll(cardCounter);
         bottomMenu.getChildren().addAll(button_GrabClipboard, button_AddToDeck, button_Export);
         leftMenu.getChildren().addAll(button_PreviousCard);
         rightMenu.getChildren().addAll(button_NextCard);
+        
+        tvDeckName.setAlignment(Pos.CENTER);
+        tvDeckName.autosize();
+        tvDeckName.setDisable(true);
+        tvDeckName.setPromptText("Enter Custom Deck Name");
         
         //centerContent.getChildren().addAll(ivPrevious2, ivPrevious, ivCurrent);
         centerContent.getChildren().addAll(previousCardBox2, previousCardBox, currentCardBox);
@@ -227,16 +239,21 @@ public class MTG_TTS_DeckBuilder extends Application implements EventHandler<Act
         
     }
     
-    public void makeButtonInactive(Button b){
-        if(!b.isDisable()){
-            b.setDisable(true);
+    public void makeNodeInactive(javafx.scene.Node n){
+        if(!n.isDisable()){
+            n.setDisable(true);
         }
     }
     
-    public void makeButtonActive(Button b){
-        if(b.isDisable()){
-            b.setDisable(false);
+    public void makeNodeActive(javafx.scene.Node n){
+        if(n.isDisable()){
+            n.setDisable(false);
         }
+    }
+    
+    public void addImage(javafx.scene.Node n){
+        WritableImage snapshotImage = n.snapshot(new SnapshotParameters(), null);
+        imageList.add(snapshotImage);
     }
     
     @Override
@@ -245,7 +262,6 @@ public class MTG_TTS_DeckBuilder extends Application implements EventHandler<Act
     }
     
     public Image grabImage(){
-        
         Clipboard clipboard = Clipboard.getSystemClipboard();
         
         Image image = null;
@@ -294,11 +310,19 @@ public class MTG_TTS_DeckBuilder extends Application implements EventHandler<Act
         }
         
         try{
-            SnapshotParameters parameters = new SnapshotParameters();
             WritableImage exportImage = new WritableImage(3320, 3255);
             WritableImage snapshot = deckCanvas.snapshot(new SnapshotParameters(), exportImage);
+            
+            String exportFileName = "MTG_TTS_Deck_" + new Date().getTime() + "_" + imageList.size() + "cards";
+            String deckName = tvDeckName.getText();
+            deckName = deckName.replaceAll(" ", "");
+            deckName = deckName.replaceAll("\"", "\\\"");
+            deckName = deckName.trim();
+            if(!deckName.isEmpty()){
+                exportFileName = deckName + "_" + imageList.size() + "cards";
+            }
 
-            File output = new File("deck" + new Date().getTime() + ".png");
+            File output = new File(exportFileName + ".png");
             ImageIO.write(SwingFXUtils.fromFXImage(snapshot, null), "png", output);
         }
         catch(IOException e){
