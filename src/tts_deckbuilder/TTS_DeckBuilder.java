@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package mtg_tts_deckbuilder;
+package tts_deckbuilder;
 
 import java.util.ArrayList;
 import javafx.application.Application;
@@ -40,7 +40,7 @@ import javafx.scene.text.TextAlignment;
  *
  * @author Jackson
  */
-public class MTG_TTS_DeckBuilder extends Application implements EventHandler<ActionEvent> {
+public class TTS_DeckBuilder extends Application implements EventHandler<ActionEvent> {
     Image deckImage;
     Image cardImage;
     Image previousImage;
@@ -82,8 +82,10 @@ public class MTG_TTS_DeckBuilder extends Application implements EventHandler<Act
         tvDeckName = new TextField();
         
         Text cardCounter = new Text("No cards added");
+        Text statusMessage = new Text();
         
         cardCounter.setFill(Color.web("#FEFEFE"));
+        statusMessage.setFill(Color.web("#FEFEFE"));
         
         ivCurrent.setFitWidth(312);
         ivCurrent.setFitHeight(445);
@@ -108,15 +110,21 @@ public class MTG_TTS_DeckBuilder extends Application implements EventHandler<Act
         ivPrevious2.setSmooth(true);
         ivPrevious2.setCache(true);
         
-        //Label label1 = new Label("MTG TTS Deck Image Generator");
+        //Label label1 = new Label("TTS Deck Builder");
         
         Button button_GrabClipboard = new Button("Grab from Clipboard");
+        
         Button button_AddToDeck = new Button("Add Card to Deck");
         button_AddToDeck.setDisable(true);
+        
         Button button_Export = new Button("Export");
         button_Export.setDisable(true);
+        
         Button button_PreviousCard = new Button("Previous Card");
+        button_PreviousCard.setDisable(true);
+        
         Button button_NextCard = new Button("Next Card");
+        button_NextCard.setDisable(true);
         
         button_GrabClipboard.setOnAction(e -> {
             System.out.println("Grabbing image...");
@@ -126,10 +134,15 @@ public class MTG_TTS_DeckBuilder extends Application implements EventHandler<Act
             if(cardImage != null){
                 ivCurrent.setImage(cardImage);
                 makeNodeActive(button_AddToDeck);
+                makeNodeInactive(statusMessage);
+                statusMessage.setVisible(false);
             }
             
             else{
                 makeNodeInactive(button_AddToDeck);
+                makeNodeActive(statusMessage);
+                statusMessage.setVisible(true);
+                statusMessage.setText("No image in clipboard.");
             }
             
         });
@@ -166,8 +179,12 @@ public class MTG_TTS_DeckBuilder extends Application implements EventHandler<Act
         });
         
         VBox topMenu = new VBox();
+        VBox leftMenu = new VBox();
+        VBox rightMenu = new VBox();
         HBox bottomMenu = new HBox();
         HBox centerContent = new HBox();
+        
+        centerContent.setSpacing(3.0);
         
         VBox currentCardBox = new VBox();
         currentCardBox.autosize();
@@ -193,11 +210,8 @@ public class MTG_TTS_DeckBuilder extends Application implements EventHandler<Act
         previousCardBox.getChildren().addAll(ivPrevious, lastText);
         previousCardBox2.getChildren().addAll(ivPrevious2, previousText);
         
-        VBox leftMenu = new VBox();
-        VBox rightMenu = new VBox();
-        
         //topMenu.getChildren().addAll(tvDeckName, cardCounter);
-        topMenu.getChildren().addAll(cardCounter);
+        topMenu.getChildren().addAll(cardCounter, statusMessage);
         bottomMenu.getChildren().addAll(button_GrabClipboard, button_AddToDeck, button_Export);
         leftMenu.getChildren().addAll(button_PreviousCard);
         rightMenu.getChildren().addAll(button_NextCard);
@@ -215,7 +229,9 @@ public class MTG_TTS_DeckBuilder extends Application implements EventHandler<Act
         //BorderPane borderPane = new BorderPane( centerContent, topMenu, rightMenu, bottomMenu, leftMenu);
         topMenu.setAlignment(Pos.TOP_CENTER);
         bottomMenu.setAlignment(Pos.BOTTOM_CENTER);
-        BorderPane borderPane = new BorderPane( centerContent, topMenu, null, bottomMenu, null);
+        
+        //BorderPane borderPane = new BorderPane( centerContent, topMenu, null, bottomMenu, null);
+        BorderPane borderPane = new BorderPane( centerContent, topMenu, rightMenu, bottomMenu, leftMenu);
         //borderPane.setAlignment(borderPane.getCenter(), Pos.CENTER);
         /*
         borderPane.setTop(topMenu);
@@ -233,8 +249,8 @@ public class MTG_TTS_DeckBuilder extends Application implements EventHandler<Act
         scene1 = new Scene(borderPane);
         
         window.setScene(scene1);
-        scene1.getStylesheets().add(MTG_TTS_DeckBuilder.class.getResource("Dark.css").toExternalForm());
-        window.setTitle("MTG TTS Deck Image Generator");
+        scene1.getStylesheets().add(TTS_DeckBuilder.class.getResource("Dark.css").toExternalForm());
+        window.setTitle("TTS Deck Builder");
         window.show();
         
     }
