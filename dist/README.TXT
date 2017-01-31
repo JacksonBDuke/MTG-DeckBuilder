@@ -1,5 +1,5 @@
 Author: Jackson Duke
-https://github.com/JacksonBDuke/MTG-DeckBuilder
+https://github.com/JacksonBDuke/TTS-DeckBuilder
 
 This application comes "as-is". There are no guarantees of any kind when using this application. Use at your own risk.
 
