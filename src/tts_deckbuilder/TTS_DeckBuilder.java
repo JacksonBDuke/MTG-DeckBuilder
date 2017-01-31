@@ -230,8 +230,8 @@ public class TTS_DeckBuilder extends Application implements EventHandler<ActionE
         topMenu.setAlignment(Pos.TOP_CENTER);
         bottomMenu.setAlignment(Pos.BOTTOM_CENTER);
         
-        //BorderPane borderPane = new BorderPane( centerContent, topMenu, null, bottomMenu, null);
-        BorderPane borderPane = new BorderPane( centerContent, topMenu, rightMenu, bottomMenu, leftMenu);
+        BorderPane borderPane = new BorderPane( centerContent, topMenu, null, bottomMenu, null);
+        //BorderPane borderPane = new BorderPane( centerContent, topMenu, rightMenu, bottomMenu, leftMenu);
         //borderPane.setAlignment(borderPane.getCenter(), Pos.CENTER);
         /*
         borderPane.setTop(topMenu);
