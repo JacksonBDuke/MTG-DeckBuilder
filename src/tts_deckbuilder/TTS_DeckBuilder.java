@@ -53,6 +53,7 @@ public class TTS_DeckBuilder extends Application implements EventHandler<ActionE
     Button button;
     Stage window;
     Scene scene1;
+    int currentIndex = 0;
     
     //File imageTemplateFile = new File(MTG_TTS_DeckBuilder.class.getResource("template.jpg").toExternalForm());
     
@@ -157,6 +158,7 @@ public class TTS_DeckBuilder extends Application implements EventHandler<ActionE
                 ivCurrent.setImage(null);
                 cardCounter.setText("Cards Added: " + imageList.size());
                 cardImage = null;
+                ++currentIndex;
             }
             if(button_Export.isDisable()){
                 makeNodeActive(button_Export);
@@ -252,6 +254,15 @@ public class TTS_DeckBuilder extends Application implements EventHandler<ActionE
         scene1.getStylesheets().add(TTS_DeckBuilder.class.getResource("Dark.css").toExternalForm());
         window.setTitle("TTS Deck Builder");
         window.show();
+        
+    }
+    
+    //Decrement currentIndex, adjust displayed cards (
+    public void cycleBackwards(){
+        
+    }
+    
+    public void cycleForwards(){
         
     }
     

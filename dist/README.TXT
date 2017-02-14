@@ -7,7 +7,7 @@ YOU MUST HAVE JAVA INSTALLED TO USE THIS APPLICATION. For the most recent versio
 
 
  ______________________________________________________________________________
-| MTG TTS Deck Image Generator                                            - □ x|
+| TTS Deck Image Generator                                                - □ x|
 |------------------------------------------------------------------------------|
 |                                [Card Counter]                                |
 |                                                                              |
