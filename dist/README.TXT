@@ -7,7 +7,7 @@ YOU MUST HAVE JAVA INSTALLED TO USE THIS APPLICATION. For the most recent versio
 
 
  ______________________________________________________________________________
-| TTS Deck Image Generator                                                - □ x|
+| MTG TTS Deck Image Generator                                            - □ X|
 |------------------------------------------------------------------------------|
 |                                [Card Counter]                                |
 |                                                                              |
@@ -42,4 +42,8 @@ Export: Saves deck image to application directory.
 
 INSTRUCTIONS
 Place the application in a folder of your choosing. Please note that the application saves deck images in whichever folder the application is in.
-
+Copy images to the system clipboard.
+Use the "Grab from Clipboard" button to place the copied image into the application.
+Press "Add to Deck" to confirm the choice of image.
+Repeat until all cards needed are added.
+Press "Export" to save the deck-image.

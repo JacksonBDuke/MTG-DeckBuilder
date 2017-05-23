@@ -159,6 +159,12 @@ public class TTS_DeckBuilder extends Application implements EventHandler<ActionE
                 cardCounter.setText("Cards Added: " + imageList.size());
                 cardImage = null;
                 ++currentIndex;
+                if(currentIndex == 70){
+                    makeNodeInactive(button_AddToDeck);
+                    makeNodeInactive(button_GrabClipboard);
+                    statusMessage.setText("Maximum cards added. No further cards may be added.");
+                    statusMessage.setVisible(true);
+                }
             }
             if(button_Export.isDisable()){
                 makeNodeActive(button_Export);
@@ -225,6 +231,7 @@ public class TTS_DeckBuilder extends Application implements EventHandler<ActionE
         
         //centerContent.getChildren().addAll(ivPrevious2, ivPrevious, ivCurrent);
         centerContent.getChildren().addAll(previousCardBox2, previousCardBox, currentCardBox);
+        centerContent.setAlignment(Pos.CENTER);
         
         //cardCounter.setText("No cards added");
         
@@ -309,6 +316,7 @@ public class TTS_DeckBuilder extends Application implements EventHandler<ActionE
         window.close();
     }
     
+    //Function to export image.
     public void exportImage(){
         
         Canvas deckCanvas = new Canvas(3320, 3255);
@@ -322,13 +330,16 @@ public class TTS_DeckBuilder extends Application implements EventHandler<ActionE
         
         int x = 10;
         int y = 10;
-        for(int i = 0; i < imageList.size() && i < 70; ++i){
+        
+        //Maximum of 70 cards per deck-image.
+        for(int i = 1; i < (imageList.size() + 1) && i < 70; ++i){
             
-            test.drawImage((Image)imageList.get(i), x, y);
+            test.drawImage((Image)imageList.get(i - 1), x, y);
             
             x+=332;
             
-            if(i%9 == 0 && i > 0){
+            //Set new row every 9 cards.
+            if(i%10 == 0 && i > 0){
                 //BufferedImage tempImage = (BufferedImage)imageList.get(i);
                 x = 10;
                 y += 465;
