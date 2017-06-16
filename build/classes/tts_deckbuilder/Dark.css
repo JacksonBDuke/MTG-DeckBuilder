@@ -1,6 +1,7 @@
 .root{
-    -fx-font-size: 16pt;
-    -fx-font-family: "Century Gothic";
+    /*-fx-font-size: 16pt;*/
+    -fx-font-size: 1.6em;
+    -fx-font-family: "Century Gothic Bold";
     -fx-background-color: #212121;
     -fx-color: #FEFEFE;
     -fx-text-fill: #FEFEFE;

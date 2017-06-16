@@ -10,10 +10,10 @@ SETTINGS: A button to show a settings window. [Settings window currently placeho
 
 
  ______________________________________________________________________________
-| MTG TTS Deck Image Generator                                            - □ X|
+| TTS Deck Builder                                                        - □ X|
 |------------------------------------------------------------------------------|
 |                                [Card Counter]                                |
-|                                                                              |
+|                               [Status Message]                               |
 |   ______________________   ______________________   ______________________   |
 |  |                      | |                      | |                      |  |
 |  |                      | |                      | |                      |  |
@@ -29,10 +29,10 @@ SETTINGS: A button to show a settings window. [Settings window currently placeho
 |  |                      | |                      | |                      |  |
 |  |______________________| |______________________| |______________________|  |
 |       Previous Added             Last Added              Current Card        |
-|                 ____________________________________________                 |
-|                |                     |             |        |                |
-|                | Grab from Clipboard | Add to Deck | Export |                |
-|________________|_____________________|_____________|________|________________|
+|            _______________________________________________________           |
+|           |          |                     |             |        |          |
+|           | Settings | Grab from Clipboard | Add to Deck | Export |          |
+|___________|__________|_____________________|_____________|________|__________|
 
 OVERVIEW
 Card Counter: Displays the number of cards currently in memory. If the deck is empty it will display a message saying so.

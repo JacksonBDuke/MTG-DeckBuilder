@@ -7,7 +7,10 @@ package tts_deckbuilder;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.image.Image;
 import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Text;
 import javafx.stage.*;
 /**
  *
@@ -16,13 +19,24 @@ import javafx.stage.*;
 public class OptionsMenu {
     public static void display(){
         Stage window = new Stage();
+        window.getIcons().add(new Image(OptionsMenu.class.getResourceAsStream("icon.png")));
         window.initModality(Modality.APPLICATION_MODAL);
         window.setTitle("Settings");
         window.setMinWidth(250);
         
+        VBox topMenu = new VBox();
+        VBox centerContent = new VBox();
+        VBox bottomMenu = new VBox();
         
-        VBox optionsContents = new VBox();
-        HBox bottomMenu = new HBox();
+        topMenu.autosize();
+        topMenu.setAlignment(Pos.TOP_CENTER);
+        
+        HBox menuButtons = new HBox();
+        menuButtons.autosize();
+        menuButtons.setAlignment(Pos.BOTTOM_CENTER);
+        
+        Text optionsText = new Text("Settings can not be changed after you add cards!");
+        optionsText.setFill(Color.web("#FEFEFE"));
         
         Button button_Apply = new Button("Apply");
         Button button_Cancel = new Button("Cancel");
@@ -41,13 +55,16 @@ public class OptionsMenu {
             restoreDefaults();
         });
         
-        bottomMenu.getChildren().addAll(button_Apply, button_RestoreDefaults, button_Cancel);
-        optionsContents.setAlignment(Pos.CENTER);
+        menuButtons.getChildren().addAll(button_Apply, button_RestoreDefaults, button_Cancel);
         
-        optionsContents.getChildren().addAll(bottomMenu);
-        optionsContents.setAlignment(Pos.CENTER);
+        topMenu.getChildren().addAll(optionsText);
+        //centerContent.getChildren().addAll(optionsText);
+        bottomMenu.getChildren().addAll(menuButtons);
         
-        Scene scene = new Scene(optionsContents);
+        //Center, Top, Right, Bottom, Left
+        BorderPane borderpane = new BorderPane(centerContent, topMenu, null, bottomMenu, null);
+        
+        Scene scene = new Scene(borderpane);
         window.setScene(scene);
         scene.getStylesheets().add(TTS_DeckBuilder.class.getResource("Dark.css").toExternalForm());
         window.showAndWait();
