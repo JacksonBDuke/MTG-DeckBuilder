@@ -11,7 +11,6 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -54,28 +53,33 @@ public class TTS_DeckBuilder extends Application implements EventHandler<ActionE
     Stage window;
     Scene scene1;
     int currentIndex = 0;
-    
-    //File imageTemplateFile = new File(MTG_TTS_DeckBuilder.class.getResource("template.jpg").toExternalForm());
+    int canvasWidth, canvasHeight, cardWidth, cardHeight, cardPadding;
+    final int CANVAS_WIDTH_DEFAULT = 3320;
+    final int CANVAS_HEIGHT_DEFAULT = 3255;
+    final int CARD_WIDTH_DEFAULT = 312;
+    final int CARD_HEIGHT_DEFAULT = 445;
+    final int CARD_PADDING_DEFAULT = 10;
     
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        // TODO code application logic here
-        //makeImage();
-        
         launch(args);
     }
     
     @Override
     public void start(Stage primaryStage) throws Exception {
         
+        canvasWidth = CANVAS_WIDTH_DEFAULT;
+        canvasHeight = CANVAS_HEIGHT_DEFAULT;
+        cardWidth = CARD_WIDTH_DEFAULT;
+        cardHeight = CARD_HEIGHT_DEFAULT;
+        cardPadding = CARD_PADDING_DEFAULT;
+        
         //window.setOnCloseRequest(e -> closeProgram());
         window = primaryStage;
         
         cardImage = previousImage = previousImage2 = null;
-        
-        //scene1 = new Scene(layout1, 312, 545);
         
         ivCurrent = new ImageView();
         ivPrevious = new ImageView();
@@ -88,30 +92,33 @@ public class TTS_DeckBuilder extends Application implements EventHandler<ActionE
         cardCounter.setFill(Color.web("#FEFEFE"));
         statusMessage.setFill(Color.web("#FEFEFE"));
         
-        ivCurrent.setFitWidth(312);
-        ivCurrent.setFitHeight(445);
+        //ivCurrent.setFitWidth(312);
+        //ivCurrent.setFitHeight(445);
+        ivCurrent.setFitWidth(CARD_WIDTH_DEFAULT);
+        ivCurrent.setFitHeight(CARD_HEIGHT_DEFAULT);
         ivCurrent.setPreserveRatio(false);
         ivCurrent.setSmooth(true);
         ivCurrent.setCache(true);
         
-        ivPrevious.setFitWidth(312);
-        ivPrevious.setFitHeight(445);
-        //ivPrevious.setPreserveRatio(false);
-        //ivPrevious.setFitWidth(234);
-        //ivPrevious.setFitHeight(367);
+        //ivPrevious.setFitWidth(312);
+        //ivPrevious.setFitHeight(445);
+        ivPrevious.setFitWidth(CARD_WIDTH_DEFAULT);
+        ivPrevious.setFitHeight(CARD_HEIGHT_DEFAULT);
+
         ivPrevious.setPreserveRatio(false);
         ivPrevious.setSmooth(true);
         ivPrevious.setCache(true);
         
-        ivPrevious2.setFitWidth(312);
-        ivPrevious2.setFitHeight(445);
+        //ivPrevious2.setFitWidth(312);
+        //ivPrevious2.setFitHeight(445);
+        ivPrevious2.setFitWidth(CARD_WIDTH_DEFAULT);
+        ivPrevious2.setFitHeight(CARD_HEIGHT_DEFAULT);
+        
         //ivPrevious2.setFitWidth(156);
         //ivPrevious2.setFitHeight(289);
         ivPrevious2.setPreserveRatio(false);
         ivPrevious2.setSmooth(true);
         ivPrevious2.setCache(true);
-        
-        //Label label1 = new Label("TTS Deck Builder");
         
         Button button_GrabClipboard = new Button("Grab from Clipboard");
         
@@ -127,63 +134,40 @@ public class TTS_DeckBuilder extends Application implements EventHandler<ActionE
         Button button_NextCard = new Button("Next Card");
         button_NextCard.setDisable(true);
         
+        Button button_Settings = new Button("Settings");
+        
         button_GrabClipboard.setOnAction(e -> {
-            System.out.println("Grabbing image...");
-            cardImage = grabImage();
-            System.out.println("Got image.");
-            
-            if(cardImage != null){
-                ivCurrent.setImage(cardImage);
-                makeNodeActive(button_AddToDeck);
-                makeNodeInactive(statusMessage);
-                statusMessage.setVisible(false);
-            }
-            
-            else{
-                makeNodeInactive(button_AddToDeck);
-                makeNodeActive(statusMessage);
-                statusMessage.setVisible(true);
-                statusMessage.setText("No image in clipboard.");
-            }
-            
+            System.out.println("Grab from Clipboard clicked.");
+            grabCard(button_AddToDeck, statusMessage);
         });
         
         
         button_AddToDeck.setOnAction(e ->{
-            if(cardImage != null){
-                addImage(ivCurrent);
-                System.out.println("Added image to list");
-                ivPrevious2.setImage(ivPrevious.getImage());
-                ivPrevious.setImage(ivCurrent.getImage());
-                ivCurrent.setImage(null);
-                cardCounter.setText("Cards Added: " + imageList.size());
-                cardImage = null;
-                ++currentIndex;
-                if(currentIndex == 70){
-                    makeNodeInactive(button_AddToDeck);
-                    makeNodeInactive(button_GrabClipboard);
-                    statusMessage.setText("Maximum cards added. No further cards may be added.");
-                    statusMessage.setVisible(true);
-                }
-            }
-            if(button_Export.isDisable()){
-                makeNodeActive(button_Export);
-            }
+            System.out.println("Add to Deck clicked.");
+            //public void addToDeck(Text counter, javafx.scene.Node buttonAdd, javafx.scene.Node buttonExport, javafx.scene.Node buttonGrab, Text status){
+            addToDeck(cardCounter, button_AddToDeck, button_Export, button_GrabClipboard, statusMessage);
         });
         
         
         button_Export.setOnAction(e ->{
+           System.out.println("Export clicked.");
+            
            System.out.println("Exporting to image...");
            exportImage();
            System.out.println("Done.");
         });
         
         button_PreviousCard.setOnAction(e ->{
-            
+            System.out.println("Previous Card clicked.");
         });
         
         button_NextCard.setOnAction(e ->{
-            
+            System.out.println("Next Card clicked.");
+        });
+        
+        button_Settings.setOnAction(e ->{
+            System.out.println("Settings clicked.");
+           changeSettings(); 
         });
         
         VBox topMenu = new VBox();
@@ -214,44 +198,33 @@ public class TTS_DeckBuilder extends Application implements EventHandler<ActionE
         Text previousText = new Text("Previous Added");
         previousText.setFill(Color.web("#FEFEFE"));
         
-        currentCardBox.getChildren().addAll(ivCurrent, currentText);
-        previousCardBox.getChildren().addAll(ivPrevious, lastText);
-        previousCardBox2.getChildren().addAll(ivPrevious2, previousText);
-        
-        //topMenu.getChildren().addAll(tvDeckName, cardCounter);
-        topMenu.getChildren().addAll(cardCounter, statusMessage);
-        bottomMenu.getChildren().addAll(button_GrabClipboard, button_AddToDeck, button_Export);
-        leftMenu.getChildren().addAll(button_PreviousCard);
-        rightMenu.getChildren().addAll(button_NextCard);
-        
         tvDeckName.setAlignment(Pos.CENTER);
         tvDeckName.autosize();
         tvDeckName.setDisable(true);
         tvDeckName.setPromptText("Enter Custom Deck Name");
         
-        //centerContent.getChildren().addAll(ivPrevious2, ivPrevious, ivCurrent);
+        currentCardBox.getChildren().addAll(ivCurrent, currentText);
+        previousCardBox.getChildren().addAll(ivPrevious, lastText);
+        previousCardBox2.getChildren().addAll(ivPrevious2, previousText);
+        
+        
+        
+        //*** Set menu contents ***
+        topMenu.getChildren().addAll(cardCounter, statusMessage);
+        bottomMenu.getChildren().addAll(button_Settings, button_GrabClipboard, button_AddToDeck, button_Export);
+        //leftMenu.getChildren().addAll(button_PreviousCard);
+        //rightMenu.getChildren().addAll(button_NextCard);
+        
         centerContent.getChildren().addAll(previousCardBox2, previousCardBox, currentCardBox);
         centerContent.setAlignment(Pos.CENTER);
         
-        //cardCounter.setText("No cards added");
-        
-        //BorderPane borderPane = new BorderPane( centerContent, topMenu, rightMenu, bottomMenu, leftMenu);
         topMenu.setAlignment(Pos.TOP_CENTER);
         bottomMenu.setAlignment(Pos.BOTTOM_CENTER);
         
         BorderPane borderPane = new BorderPane( centerContent, topMenu, null, bottomMenu, null);
-        //BorderPane borderPane = new BorderPane( centerContent, topMenu, rightMenu, bottomMenu, leftMenu);
-        //borderPane.setAlignment(borderPane.getCenter(), Pos.CENTER);
-        /*
-        borderPane.setTop(topMenu);
-        borderPane.setLeft(leftMenu);
-        borderPane.setRight(rightMenu);
-        borderPane.setBottom(bottomMenu);
-        borderPane.setCenter(centerContent);
-        */
+
         borderPane.setAlignment(borderPane.getBottom(), Pos.BOTTOM_CENTER);
-        //borderPane.setAlignment(bottomMenu, Pos.BOTTOM_CENTER);
-        
+
         
         borderPane.autosize();
         
@@ -264,37 +237,90 @@ public class TTS_DeckBuilder extends Application implements EventHandler<ActionE
         
     }
     
-    //Decrement currentIndex, adjust displayed cards (
+    //***   Decrement currentIndex, adjust displayed cards [NOT IMPLEMENTED] ***
     public void cycleBackwards(){
         
     }
     
+    //***   Increment currentIndex, adjust displayed cards [NOT IMPLEMENTED] ***
     public void cycleForwards(){
         
     }
     
+    public void grabCard(javafx.scene.Node n, Text m){
+        System.out.println("Grabbing image...");
+            cardImage = grabImage();
+            System.out.println("Got image.");
+            
+            if(cardImage != null){
+                ivCurrent.setImage(cardImage);
+                makeNodeActive(n);
+                makeNodeInactive(m);
+                m.setVisible(false);
+            }
+            
+            else{
+                makeNodeInactive(n);
+                makeNodeActive(m);
+                m.setVisible(true);
+                m.setText("No image in clipboard.");
+            }
+    }
+    
+    public void addToDeck(Text counter, javafx.scene.Node buttonAdd, javafx.scene.Node buttonExport, javafx.scene.Node buttonGrab, Text status){
+        if(cardImage != null){
+                addImage(ivCurrent);
+                System.out.println("Added image to list");
+                ivPrevious2.setImage(ivPrevious.getImage());
+                ivPrevious.setImage(ivCurrent.getImage());
+                ivCurrent.setImage(null);
+                counter.setText("Cards Added: " + imageList.size());
+                cardImage = null;
+                ++currentIndex;
+                if(currentIndex == 70){
+                    makeNodeInactive(buttonAdd);
+                    makeNodeInactive(buttonGrab);
+                    status.setText("Maximum cards added. No further cards may be added.");
+                    status.setVisible(true);
+                }
+            }
+            if(buttonExport.isDisable()){
+                makeNodeActive(buttonExport);
+            }
+    }
+    
+    //***   Show the settings window    ***
+    public void changeSettings(){
+        OptionsMenu.display();
+    }
+    
+    //***   Disable a passed node which is currently enabled    ***
     public void makeNodeInactive(javafx.scene.Node n){
         if(!n.isDisable()){
             n.setDisable(true);
         }
     }
     
+    //***   Enable a passed node which is currently disabled   ***
     public void makeNodeActive(javafx.scene.Node n){
         if(n.isDisable()){
             n.setDisable(false);
         }
     }
     
+    //***   Add the current image to the list   ***
     public void addImage(javafx.scene.Node n){
         WritableImage snapshotImage = n.snapshot(new SnapshotParameters(), null);
         imageList.add(snapshotImage);
     }
     
+    //***   Handle unknown ActionEvent events   ***
     @Override
     public void handle(ActionEvent event) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     
+    //***   Get image data from the clipboard.  ***
     public Image grabImage(){
         Clipboard clipboard = Clipboard.getSystemClipboard();
         
@@ -319,36 +345,40 @@ public class TTS_DeckBuilder extends Application implements EventHandler<ActionE
     //Function to export image.
     public void exportImage(){
         
-        Canvas deckCanvas = new Canvas(3320, 3255);
+        //Canvas deckCanvas = new Canvas(3320, 3255);
+        Canvas deckCanvas = new Canvas(canvasWidth, canvasHeight);
+        
         GraphicsContext test = deckCanvas.getGraphicsContext2D();
         test.setFill(Color.BLACK);
         test.fillRect(0, 0, deckCanvas.getWidth(), deckCanvas.getHeight());
-        //test.rect(0, 0, 3320, 3255);
         
-        
-        //Graphics2D deckMaker = imageTemplate.createGraphics();
-        
-        int x = 10;
-        int y = 10;
+        //int x = 10;
+        //int y = 10;
+        int x = cardPadding;
+        int y = cardPadding;
         
         //Maximum of 70 cards per deck-image.
         for(int i = 1; i < (imageList.size() + 1) && i < 70; ++i){
             
             test.drawImage((Image)imageList.get(i - 1), x, y);
             
-            x+=332;
+            //x+=(cardWidth + (2*10));
+            x+=(cardWidth + (2 * cardPadding));
             
             //Set new row every 9 cards.
             if(i%10 == 0 && i > 0){
                 //BufferedImage tempImage = (BufferedImage)imageList.get(i);
-                x = 10;
-                y += 465;
+                //x = 10;
+                //y += 465;
+                x = cardPadding;
+                y += (cardHeight + (2 * cardPadding));
                 //deckMaker.drawImage(imageList.get(i), x, y);   
             }
         }
         
         try{
-            WritableImage exportImage = new WritableImage(3320, 3255);
+            //WritableImage exportImage = new WritableImage(3320, 3255);
+            WritableImage exportImage = new WritableImage(canvasWidth, canvasHeight);
             WritableImage snapshot = deckCanvas.snapshot(new SnapshotParameters(), exportImage);
             
             String exportFileName = "MTG_TTS_Deck_" + new Date().getTime() + "_" + imageList.size() + "cards";
@@ -366,9 +396,6 @@ public class TTS_DeckBuilder extends Application implements EventHandler<ActionE
         catch(IOException e){
             System.err.println(e.getMessage());
         }
-        
-        
-        //canvas.snapshot
     }
     public void handle(KeyEvent event) {
         if (event.isControlDown() && event.getCode() == KeyCode.V) {

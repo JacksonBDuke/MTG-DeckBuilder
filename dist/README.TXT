@@ -5,6 +5,9 @@ This application comes "as-is". There are no guarantees of any kind when using t
 
 YOU MUST HAVE JAVA INSTALLED TO USE THIS APPLICATION. For the most recent version of Java, please go to https://java.com/en/download/
 
+RECENTLY ADDED FEATURES
+SETTINGS: A button to show a settings window. [Settings window currently placeholder]
+
 
  ______________________________________________________________________________
 | MTG TTS Deck Image Generator                                            - □ X|
