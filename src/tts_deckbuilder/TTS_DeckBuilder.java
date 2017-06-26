@@ -156,9 +156,8 @@ public class TTS_DeckBuilder extends Application implements EventHandler<ActionE
         
         button_Export.setOnAction(e ->{
            System.out.println("Export clicked.");
-            
            System.out.println("Exporting to image...");
-           exportImage();
+           exportImage(statusMessage);
            System.out.println("Done.");
         });
         
@@ -349,7 +348,9 @@ public class TTS_DeckBuilder extends Application implements EventHandler<ActionE
     }
     
     //Function to export image.
-    public void exportImage(){
+    public void exportImage(Text t){
+        
+        String exportFileName = "Error Exporting";
         
         //Canvas deckCanvas = new Canvas(3320, 3255);
         Canvas deckCanvas = new Canvas(canvasWidth, canvasHeight);
@@ -387,7 +388,7 @@ public class TTS_DeckBuilder extends Application implements EventHandler<ActionE
             WritableImage exportImage = new WritableImage(canvasWidth, canvasHeight);
             WritableImage snapshot = deckCanvas.snapshot(new SnapshotParameters(), exportImage);
             
-            String exportFileName = "MTG_TTS_Deck_" + new Date().getTime() + "_" + imageList.size() + "cards";
+            exportFileName = "MTG_TTS_Deck_" + new Date().getTime() + "_" + imageList.size() + "cards";
             String deckName = tvDeckName.getText();
             deckName = deckName.replaceAll(" ", "");
             deckName = deckName.replaceAll("\"", "\\\"");
@@ -402,6 +403,10 @@ public class TTS_DeckBuilder extends Application implements EventHandler<ActionE
         catch(IOException e){
             System.err.println(e.getMessage());
         }
+        
+        t.setText("Exported to " + exportFileName + ".png");
+        t.setVisible(true);
+        
     }
     public void handle(KeyEvent event) {
         if (event.isControlDown() && event.getCode() == KeyCode.V) {
