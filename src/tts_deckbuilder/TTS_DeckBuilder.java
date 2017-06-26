@@ -388,7 +388,7 @@ public class TTS_DeckBuilder extends Application implements EventHandler<ActionE
             WritableImage exportImage = new WritableImage(canvasWidth, canvasHeight);
             WritableImage snapshot = deckCanvas.snapshot(new SnapshotParameters(), exportImage);
             
-            exportFileName = "MTG_TTS_Deck_" + new Date().getTime() + "_" + imageList.size() + "cards";
+            exportFileName = "TTS_Deck_" + new Date().getTime() + "_" + imageList.size() + "cards";
             String deckName = tvDeckName.getText();
             deckName = deckName.replaceAll(" ", "");
             deckName = deckName.replaceAll("\"", "\\\"");
