@@ -34,7 +34,6 @@ import javafx.scene.image.WritableImage;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.paint.Color;
-import javafx.scene.text.TextAlignment;
 import javafx.stage.Screen;
 
 /**
@@ -57,6 +56,20 @@ public class TTS_DeckBuilder extends Application implements EventHandler<ActionE
     Button button;
     Stage window;
     Scene scene1;
+    
+    Text cardCounter;
+    Text statusMessage;
+    Text currentText;
+    Text lastText;
+    Text previousText;
+    
+    Button button_GrabClipboard;
+    Button button_AddToDeck;
+    Button button_Export;
+    Button button_PreviousCard;
+    Button button_NextCard;
+    Button button_Settings;
+    
     int currentIndex = 0;
     int canvasWidth, canvasHeight, cardWidth, cardHeight, cardPadding;
     
@@ -91,8 +104,8 @@ public class TTS_DeckBuilder extends Application implements EventHandler<ActionE
         ivPrevious2 = new ImageView();
         tvDeckName = new TextField();
         
-        Text cardCounter = new Text("No cards added");
-        Text statusMessage = new Text();
+        cardCounter = new Text("No cards added");
+        statusMessage = new Text();
         
         cardCounter.setFill(Color.web("#FEFEFE"));
         statusMessage.setFill(Color.web("#FEFEFE"));
@@ -125,32 +138,32 @@ public class TTS_DeckBuilder extends Application implements EventHandler<ActionE
         ivPrevious2.setSmooth(true);
         ivPrevious2.setCache(true);
         
-        Button button_GrabClipboard = new Button("Grab from Clipboard");
+        button_GrabClipboard = new Button("Grab from Clipboard");
         
-        Button button_AddToDeck = new Button("Add Card to Deck");
+        button_AddToDeck = new Button("Add Card to Deck");
         button_AddToDeck.setDisable(true);
         
-        Button button_Export = new Button("Export");
+        button_Export = new Button("Export");
         button_Export.setDisable(true);
         
-        Button button_PreviousCard = new Button("Previous Card");
+        button_PreviousCard = new Button("Previous Card");
         button_PreviousCard.setDisable(true);
         
-        Button button_NextCard = new Button("Next Card");
+        button_NextCard = new Button("Next Card");
         button_NextCard.setDisable(true);
         
-        Button button_Settings = new Button("Settings");
+        button_Settings = new Button("Settings");
         
         button_GrabClipboard.setOnAction(e -> {
             System.out.println("Grab from Clipboard clicked.");
-            grabCard(button_AddToDeck, statusMessage);
+            grabCard();
         });
         
         
         button_AddToDeck.setOnAction(e ->{
             System.out.println("Add to Deck clicked.");
             //public void addToDeck(Text counter, javafx.scene.Node buttonAdd, javafx.scene.Node buttonExport, javafx.scene.Node buttonGrab, Text status){
-            addToDeck(cardCounter, button_Settings, button_AddToDeck, button_Export, button_GrabClipboard, statusMessage);
+            addToDeck();
         });
         
         
@@ -195,11 +208,11 @@ public class TTS_DeckBuilder extends Application implements EventHandler<ActionE
         previousCardBox2.setAlignment(Pos.CENTER);
         
         
-        Text currentText = new Text("Current Card");
+        currentText = new Text("Current Card");
         currentText.setFill(Color.web("#FEFEFE"));
-        Text lastText = new Text("Last Added");
+        lastText = new Text("Last Added");
         lastText.setFill(Color.web("#FEFEFE"));
-        Text previousText = new Text("Previous Added");
+        previousText = new Text("Previous Added");
         previousText.setFill(Color.web("#FEFEFE"));
         
         tvDeckName.setAlignment(Pos.CENTER);
@@ -224,10 +237,7 @@ public class TTS_DeckBuilder extends Application implements EventHandler<ActionE
         bottomMenu.setAlignment(Pos.BOTTOM_CENTER);
         
         BorderPane borderPane = new BorderPane( centerContent, topMenu, null, bottomMenu, null);
-
         borderPane.setAlignment(borderPane.getBottom(), Pos.BOTTOM_CENTER);
-
-        
         borderPane.autosize();
         
         scene1 = new Scene(borderPane);
@@ -236,7 +246,6 @@ public class TTS_DeckBuilder extends Application implements EventHandler<ActionE
         scene1.getStylesheets().add(TTS_DeckBuilder.class.getResource("Dark.css").toExternalForm());
         window.setTitle("TTS Deck Builder");
         window.show();
-        
     }
     
     //***   Decrement currentIndex, adjust displayed cards [NOT IMPLEMENTED] ***
@@ -249,48 +258,48 @@ public class TTS_DeckBuilder extends Application implements EventHandler<ActionE
         
     }
     
-    public void grabCard(javafx.scene.Node n, Text m){
+    public void grabCard(){
         System.out.println("Grabbing image...");
             cardImage = grabImage();
             System.out.println("Got image.");
             
             if(cardImage != null){
                 ivCurrent.setImage(cardImage);
-                makeNodeActive(n);
-                makeNodeInactive(m);
-                m.setVisible(false);
+                makeNodeActive(button_AddToDeck);
+                makeNodeInactive(statusMessage);
+                statusMessage.setVisible(false);
             }
             
             else{
-                makeNodeInactive(n);
-                makeNodeActive(m);
-                m.setVisible(true);
-                m.setText("No image in clipboard.");
+                makeNodeInactive(button_AddToDeck);
+                makeNodeActive(statusMessage);
+                statusMessage.setVisible(true);
+                statusMessage.setText("No image in clipboard.");
             }
     }
     
-    public void addToDeck(Text counter, javafx.scene.Node buttonSettings, javafx.scene.Node buttonAdd, javafx.scene.Node buttonExport, javafx.scene.Node buttonGrab, Text status){
+    public void addToDeck(){
         if(cardImage != null){
             addImage(ivCurrent);
             System.out.println("Added image to list");
             ivPrevious2.setImage(ivPrevious.getImage());
             ivPrevious.setImage(ivCurrent.getImage());
             ivCurrent.setImage(null);
-            counter.setText("Cards Added: " + imageList.size());
+            cardCounter.setText("Cards Added: " + imageList.size());
             cardImage = null;
             ++currentIndex;
             if(currentIndex == 70){
-                makeNodeInactive(buttonAdd);
-                makeNodeInactive(buttonGrab);
-                status.setText("Maximum cards added. No further cards may be added.");
-                status.setVisible(true);
+                makeNodeInactive(button_AddToDeck);
+                makeNodeInactive(button_GrabClipboard);
+                statusMessage.setText("Maximum cards added. No further cards may be added.");
+                statusMessage.setVisible(true);
             }
-            if(!buttonSettings.isDisable()){
-                makeNodeInactive(buttonSettings);
+            if(!button_Settings.isDisable()){
+                makeNodeInactive(button_Settings);
             }
         }
-        if(buttonExport.isDisable()){
-            makeNodeActive(buttonExport);
+        if(button_Export.isDisable()){
+            makeNodeActive(button_Export);
         }
     }
     
