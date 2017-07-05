@@ -5,6 +5,8 @@
  */
 package tts_deckbuilder;
 
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
@@ -110,30 +112,20 @@ public class TTS_DeckBuilder extends Application implements EventHandler<ActionE
         cardCounter.setFill(Color.web("#FEFEFE"));
         statusMessage.setFill(Color.web("#FEFEFE"));
         
-        //ivCurrent.setFitWidth(312);
-        //ivCurrent.setFitHeight(445);
         ivCurrent.setFitWidth(cardWidth);
         ivCurrent.setFitHeight(cardHeight);
         ivCurrent.setPreserveRatio(false);
         ivCurrent.setSmooth(true);
         ivCurrent.setCache(true);
         
-        //ivPrevious.setFitWidth(312);
-        //ivPrevious.setFitHeight(445);
         ivPrevious.setFitWidth(cardWidth);
         ivPrevious.setFitHeight(cardHeight);
-
         ivPrevious.setPreserveRatio(false);
         ivPrevious.setSmooth(true);
         ivPrevious.setCache(true);
         
-        //ivPrevious2.setFitWidth(312);
-        //ivPrevious2.setFitHeight(445);
         ivPrevious2.setFitWidth(cardWidth);
         ivPrevious2.setFitHeight(cardHeight);
-        
-        //ivPrevious2.setFitWidth(156);
-        //ivPrevious2.setFitHeight(289);
         ivPrevious2.setPreserveRatio(false);
         ivPrevious2.setSmooth(true);
         ivPrevious2.setCache(true);
@@ -159,13 +151,11 @@ public class TTS_DeckBuilder extends Application implements EventHandler<ActionE
             grabCard();
         });
         
-        
         button_AddToDeck.setOnAction(e ->{
             System.out.println("Add to Deck clicked.");
             //public void addToDeck(Text counter, javafx.scene.Node buttonAdd, javafx.scene.Node buttonExport, javafx.scene.Node buttonGrab, Text status){
             addToDeck();
         });
-        
         
         button_Export.setOnAction(e ->{
            System.out.println("Export clicked.");
@@ -207,7 +197,6 @@ public class TTS_DeckBuilder extends Application implements EventHandler<ActionE
         previousCardBox2.autosize();
         previousCardBox2.setAlignment(Pos.CENTER);
         
-        
         currentText = new Text("Current Card");
         currentText.setFill(Color.web("#FEFEFE"));
         lastText = new Text("Last Added");
@@ -241,7 +230,6 @@ public class TTS_DeckBuilder extends Application implements EventHandler<ActionE
         borderPane.autosize();
         
         scene1 = new Scene(borderPane);
-        
         window.setScene(scene1);
         scene1.getStylesheets().add(TTS_DeckBuilder.class.getResource("Dark.css").toExternalForm());
         window.setTitle("TTS Deck Builder");
@@ -258,6 +246,11 @@ public class TTS_DeckBuilder extends Application implements EventHandler<ActionE
         
     }
     
+    /**
+     * Method takes image from the clipboard. If the object is not an image, then no image will be taken and the result will be NULL.
+     * If NULL, set the alert text to tell user there is no image in the clipboard.
+     * If image is there, copy it into the ArrayList and disable Settings button.
+     */
     public void grabCard(){
         System.out.println("Grabbing image...");
             cardImage = grabImage();
@@ -277,10 +270,12 @@ public class TTS_DeckBuilder extends Application implements EventHandler<ActionE
                 statusMessage.setText("No image in clipboard.");
             }
     }
-    
+    /**
+     * Take the image temporarily stored in the 
+     */
     public void addToDeck(){
         if(cardImage != null){
-            addImage(ivCurrent);
+            addImage(cardImage);
             System.out.println("Added image to list");
             ivPrevious2.setImage(ivPrevious.getImage());
             ivPrevious.setImage(ivCurrent.getImage());
@@ -305,7 +300,9 @@ public class TTS_DeckBuilder extends Application implements EventHandler<ActionE
     
     //***   Show the settings window    ***
     public void changeSettings(){
-        OptionsMenu.display();
+        OptionsMenu.display(controller);
+        updateValues();
+        System.out.println("Values updated.");
     }
     
     //***   Disable a passed node which is currently enabled    ***
@@ -322,10 +319,10 @@ public class TTS_DeckBuilder extends Application implements EventHandler<ActionE
         }
     }
     
-    //***   Add the current image to the list   ***
-    public void addImage(javafx.scene.Node n){
-        WritableImage snapshotImage = n.snapshot(new SnapshotParameters(), null);
-        imageList.add(snapshotImage);
+    //***   Add the current image to the list by taking a Snapshot of the imageView   ***
+    public void addImage(Image i){
+        Image imageToAdd = scaleImage(i, cardWidth, cardHeight);
+        imageList.add(imageToAdd);
     }
     
     //***   Handle unknown ActionEvent events   ***
@@ -422,5 +419,38 @@ public class TTS_DeckBuilder extends Application implements EventHandler<ActionE
             cardImage = grabImage();
             ivCurrent.setImage(cardImage);
         }
+    }
+    /**
+     * Update the local values for the card and canvas from the Controller class.
+     */
+    public void updateValues(){
+        canvasWidth = controller.getCanvasWidth();
+        canvasHeight = controller.getCanvasHeight();
+        cardWidth = controller.getCardWidth();
+        cardHeight = controller.getCardHeight();
+        cardPadding = controller.getCardPadding();
+    }
+    
+    /**
+     * Scale passed image to desired desired width and height.
+     * @param iTS
+     * @param dWidth
+     * @param dHeight
+     * @return 
+     */
+    public static Image scaleImage(Image iTS, int dWidth, int dHeight){
+        Image outputImage = null;
+        BufferedImage oImage = null;
+        BufferedImage imageToScale = SwingFXUtils.fromFXImage(iTS, null);
+        
+        if(imageToScale != null){
+            oImage = new BufferedImage(dWidth, dHeight, imageToScale.getType());
+            Graphics2D g2D = oImage.createGraphics();
+            g2D.drawImage(imageToScale, 0, 0, dWidth, dHeight, null);
+            g2D.dispose();
+        }
+        
+        outputImage = SwingFXUtils.toFXImage(oImage, null);
+        return outputImage;
     }
 }
