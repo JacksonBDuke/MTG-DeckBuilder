@@ -34,6 +34,8 @@ import javafx.scene.control.TextField;
 import javafx.scene.text.Text;
 import javafx.scene.image.WritableImage;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.paint.Color;
 import javafx.stage.Screen;
@@ -45,6 +47,8 @@ import javafx.stage.Screen;
 public class TTS_DeckBuilder extends Application implements EventHandler<ActionEvent> {
     Rectangle2D primaryScreenBounds = Screen.getPrimary().getVisualBounds();
     private final double DPI = Screen.getPrimary().getDpi();
+    private final KeyCombination kcombo_ControlV = new KeyCodeCombination(KeyCode.V, KeyCombination.CONTROL_DOWN);
+    private final KeyCombination kcombo_Enter = new KeyCodeCombination(KeyCode.ENTER);
     
     Image deckImage;
     Image cardImage;
@@ -230,6 +234,16 @@ public class TTS_DeckBuilder extends Application implements EventHandler<ActionE
         borderPane.autosize();
         
         scene1 = new Scene(borderPane);
+        scene1.getAccelerators().put(kcombo_ControlV, new Runnable(){
+            @Override public void run(){
+                grabCard();
+            }
+        });
+        scene1.getAccelerators().put(kcombo_Enter, new Runnable(){
+           @Override public void run(){
+               addToDeck();
+           } 
+        });
         window.setScene(scene1);
         scene1.getStylesheets().add(TTS_DeckBuilder.class.getResource("Dark.css").toExternalForm());
         window.setTitle("TTS Deck Builder");
@@ -292,9 +306,13 @@ public class TTS_DeckBuilder extends Application implements EventHandler<ActionE
             if(!button_Settings.isDisable()){
                 makeNodeInactive(button_Settings);
             }
-        }
-        if(button_Export.isDisable()){
+            if(button_Export.isDisable()){
             makeNodeActive(button_Export);
+            }
+        }
+        else{
+            statusMessage.setVisible(true);
+            statusMessage.setText("No image to add.");
         }
     }
     
@@ -414,12 +432,7 @@ public class TTS_DeckBuilder extends Application implements EventHandler<ActionE
         t.setVisible(true);
         
     }
-    public void handle(KeyEvent event) {
-        if (event.isControlDown() && event.getCode() == KeyCode.V) {
-            cardImage = grabImage();
-            ivCurrent.setImage(cardImage);
-        }
-    }
+    
     /**
      * Update the local values for the card and canvas from the Controller class.
      */

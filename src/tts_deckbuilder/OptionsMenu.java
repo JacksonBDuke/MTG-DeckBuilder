@@ -4,7 +4,6 @@
  * and open the template in the editor.
  */
 package tts_deckbuilder;
-import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
