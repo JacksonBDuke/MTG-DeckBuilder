@@ -1,7 +1,5 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * 
  */
 package tts_deckbuilder;
 
@@ -373,22 +371,17 @@ public class TTS_DeckBuilder extends Application implements EventHandler<ActionE
     
     //Function to export image.
     public void exportImage(Text t){
-        
         String exportFileName = "Error Exporting";
-        
-        //Canvas deckCanvas = new Canvas(3320, 3255);
         Canvas deckCanvas = new Canvas(canvasWidth, canvasHeight);
-        
         GraphicsContext test = deckCanvas.getGraphicsContext2D();
         test.setFill(Color.BLACK);
         test.fillRect(0, 0, deckCanvas.getWidth(), deckCanvas.getHeight());
-        
-        //int x = 10;
-        //int y = 10;
+
         int x = cardPadding;
         int y = cardPadding;
         
         //Maximum of 70 cards per deck-image.
+        //Maybe implement custom number.
         for(int i = 1; i < (imageList.size() + 1) && i < 70; ++i){
             
             test.drawImage((Image)imageList.get(i - 1), x, y);
@@ -420,7 +413,7 @@ public class TTS_DeckBuilder extends Application implements EventHandler<ActionE
             if(!deckName.isEmpty()){
                 exportFileName = deckName + "_" + imageList.size() + "cards";
             }
-
+            
             File output = new File(exportFileName + ".png");
             ImageIO.write(SwingFXUtils.fromFXImage(snapshot, null), "png", output);
         }
@@ -430,7 +423,6 @@ public class TTS_DeckBuilder extends Application implements EventHandler<ActionE
         
         t.setText("Exported to " + exportFileName + ".png");
         t.setVisible(true);
-        
     }
     
     /**

@@ -122,12 +122,6 @@ public class OptionsMenu {
         window.setTitle("Settings");
         window.setMinWidth(250);
         
-        /*
-        HBox centerContent = new HBox();
-        centerContent.autosize();
-        centerContent.setAlignment(Pos.CENTER);
-        */
-        
         VBox topMenu = new VBox();
         topMenu.autosize();
         topMenu.setAlignment(Pos.CENTER);
@@ -141,10 +135,6 @@ public class OptionsMenu {
         HBox bottomMenu = new HBox();
         bottomMenu.autosize();
         bottomMenu.setAlignment(Pos.CENTER);
-        
-        //VBox menuButtons = new VBox();
-        //menuButtons.autosize();
-        //menuButtons.setAlignment(Pos.CENTER);
         
         HBox box1 = new HBox();
         box1.autosize();
@@ -192,8 +182,6 @@ public class OptionsMenu {
             
             refreshDisplayedValues();
         });
-        
-        
         
         topMenu.getChildren().addAll(TEXT_OPTIONS);
         //leftMenu.getChildren().addAll(CanvasWidthLabel, CanvasHeightLabel, CardWidthLabel, CardHeightLabel, CardPaddingLabel);
