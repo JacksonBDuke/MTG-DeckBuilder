@@ -1,6 +1,3 @@
-/*
- * 
- */
 package tts_deckbuilder;
 
 import java.awt.Graphics2D;
@@ -34,7 +31,7 @@ import javafx.scene.image.WritableImage;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
-import javafx.scene.input.KeyEvent;
+//import javafx.scene.input.KeyEvent;
 import javafx.scene.paint.Color;
 import javafx.stage.Screen;
 
@@ -43,6 +40,7 @@ import javafx.stage.Screen;
  * @author Jackson
  */
 public class TTS_DeckBuilder extends Application implements EventHandler<ActionEvent> {
+    
     Rectangle2D primaryScreenBounds = Screen.getPrimary().getVisualBounds();
     private final double DPI = Screen.getPrimary().getDpi();
     private final KeyCombination kcombo_ControlV = new KeyCodeCombination(KeyCode.V, KeyCombination.CONTROL_DOWN);
@@ -52,11 +50,15 @@ public class TTS_DeckBuilder extends Application implements EventHandler<ActionE
     Image cardImage;
     Image previousImage;
     Image previousImage2;
+    
     ImageView ivCurrent;
     ImageView ivPrevious;
     ImageView ivPrevious2;
+    
     TextField tvDeckName;
+    
     ArrayList<Image> imageList = new ArrayList();
+    
     Button button;
     Stage window;
     Scene scene1;
@@ -150,7 +152,7 @@ public class TTS_DeckBuilder extends Application implements EventHandler<ActionE
         
         button_GrabClipboard.setOnAction(e -> {
             System.out.println("Grab from Clipboard clicked.");
-            grabCard();
+            setCurrentImageToClipboardContents();
         });
         
         button_AddToDeck.setOnAction(e ->{
@@ -162,7 +164,7 @@ public class TTS_DeckBuilder extends Application implements EventHandler<ActionE
         button_Export.setOnAction(e ->{
            System.out.println("Export clicked.");
            System.out.println("Exporting to image...");
-           exportImage(statusMessage);
+           exportDeck(statusMessage);
            System.out.println("Done.");
         });
         
@@ -228,13 +230,13 @@ public class TTS_DeckBuilder extends Application implements EventHandler<ActionE
         bottomMenu.setAlignment(Pos.BOTTOM_CENTER);
         
         BorderPane borderPane = new BorderPane( centerContent, topMenu, null, bottomMenu, null);
-        borderPane.setAlignment(borderPane.getBottom(), Pos.BOTTOM_CENTER);
+        BorderPane.setAlignment(borderPane.getBottom(), Pos.BOTTOM_CENTER);
         borderPane.autosize();
         
         scene1 = new Scene(borderPane);
         scene1.getAccelerators().put(kcombo_ControlV, new Runnable(){
             @Override public void run(){
-                grabCard();
+                setCurrentImageToClipboardContents();
             }
         });
         scene1.getAccelerators().put(kcombo_Enter, new Runnable(){
@@ -263,9 +265,9 @@ public class TTS_DeckBuilder extends Application implements EventHandler<ActionE
      * If NULL, set the alert text to tell user there is no image in the clipboard.
      * If image is there, copy it into the ArrayList and disable Settings button.
      */
-    public void grabCard(){
+    public void setCurrentImageToClipboardContents(){
         System.out.println("Grabbing image...");
-            cardImage = grabImage();
+            cardImage = getImageFromClipboard();
             System.out.println("Got image.");
             
             if(cardImage != null){
@@ -348,60 +350,41 @@ public class TTS_DeckBuilder extends Application implements EventHandler<ActionE
     }
     
     //***   Get image data from the clipboard.  ***
-    public Image grabImage(){
-        Clipboard clipboard = Clipboard.getSystemClipboard();
-        
-        Image image = null;
-        image = clipboard.getImage();
-
-        return image;
+    public Image getImageFromClipboard(){
+        return Clipboard.getSystemClipboard().getImage();
     }
     
     private void closeProgram(){
         System.out.println("Program exited.");
-        /*
-        boolean answer = ConfirmBox.display("Title", "Are you sure you want to close the program?");
-        
-        if(answer){
-            window.close();
-        }
-        */
         window.close();
     }
     
-    //Function to export image.
-    public void exportImage(Text t){
+    public void exportDeck(Text statusMessage){
         String exportFileName = "Error Exporting";
         Canvas deckCanvas = new Canvas(canvasWidth, canvasHeight);
-        GraphicsContext test = deckCanvas.getGraphicsContext2D();
-        test.setFill(Color.BLACK);
-        test.fillRect(0, 0, deckCanvas.getWidth(), deckCanvas.getHeight());
+        GraphicsContext temporaryCanvas = deckCanvas.getGraphicsContext2D();
+        temporaryCanvas.setFill(Color.BLACK);
+        temporaryCanvas.fillRect(0, 0, deckCanvas.getWidth(), deckCanvas.getHeight());
 
-        int x = cardPadding;
-        int y = cardPadding;
+        int xPadding = cardPadding;
+        int yPadding = cardPadding;
         
         //Maximum of 70 cards per deck-image.
         //Maybe implement custom number.
         for(int i = 1; i < (imageList.size() + 1) && i < 70; ++i){
             
-            test.drawImage((Image)imageList.get(i - 1), x, y);
-            
-            //x+=(cardWidth + (2*10));
-            x+=(cardWidth + (2 * cardPadding));
+            temporaryCanvas.drawImage((Image)imageList.get(i - 1), xPadding, yPadding);
+
+            xPadding+= totalCardWidthWithPadding();
             
             //Set new row every 9 cards.
             if(i%10 == 0 && i > 0){
-                //BufferedImage tempImage = (BufferedImage)imageList.get(i);
-                //x = 10;
-                //y += 465;
-                x = cardPadding;
-                y += (cardHeight + (2 * cardPadding));
-                //deckMaker.drawImage(imageList.get(i), x, y);   
+                xPadding = cardPadding;
+                yPadding += totalCardHeightWithPadding();
             }
         }
         
         try{
-            //WritableImage exportImage = new WritableImage(3320, 3255);
             WritableImage exportImage = new WritableImage(canvasWidth, canvasHeight);
             WritableImage snapshot = deckCanvas.snapshot(new SnapshotParameters(), exportImage);
             
@@ -421,8 +404,16 @@ public class TTS_DeckBuilder extends Application implements EventHandler<ActionE
             System.err.println(e.getMessage());
         }
         
-        t.setText("Exported to " + exportFileName + ".png");
-        t.setVisible(true);
+        statusMessage.setText("Exported to " + exportFileName + ".png");
+        statusMessage.setVisible(true);
+    }
+    
+    public int totalCardWidthWithPadding(){
+        return (cardWidth + (2 * cardPadding));
+    }
+    
+    public int totalCardHeightWithPadding(){
+        return (cardHeight + (2 * cardPadding));
     }
     
     /**
