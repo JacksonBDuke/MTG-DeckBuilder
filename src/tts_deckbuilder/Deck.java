@@ -22,43 +22,47 @@ public class Deck {
     private static int desiredCardOutlineThickness;
     private static int desiredCardWidth;
     private static int desiredCardHeight;
-    private static String deckName;
+        private static String deckName;
     
     ArrayList<Card> deckList;
+    
     
     public Deck(){
         deckList = new ArrayList();
     }
     
-    public Deck(int width, int height, String name){
-        desiredDeckImageWidth = width;
-        desiredDeckImageHeight = height;
+    public Deck(String name){
         deckName = name; // Need to run this through regex
         deckList = new ArrayList();
-    }
-    
-    public void setDeckName(String name){
-        deckName = name;
     }
     
     public String getDeckName(){
         return deckName;
     }
     
-    public void setWidthHeight(int width, int height){
-        desiredDeckImageWidth = width;
-        desiredDeckImageHeight = height;
-    }
-    
-    public void add(Card c){
+    public void addCard(Card c){
         deckList.add(c);
     }
     
-    public Card get(int index){
+    public void removeCard(Card c){
+        deckList.remove(c);
+    }
+    
+    public void removeCardAtIndex(int index){
+        deckList.remove(index);
+    }
+    
+    public Card getCardAtIndex(int index){
         return deckList.get(index);
     }
     
-    public void resizeCards(){
-        
+    public int size(){
+        return deckList.size();
+    }
+    
+    public void resizeCards(int width, int height){
+        deckList.forEach((c) -> {
+            c.scaleImage(width, height);
+        });
     }
 }

@@ -169,6 +169,7 @@ public class OptionsMenu {
         
         button_Apply.setOnAction(e->{
             applySettings();
+            window.close();
         });
         
         button_RestoreDefaults.setOnAction(e->{

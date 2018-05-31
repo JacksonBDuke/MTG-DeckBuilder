@@ -43,6 +43,7 @@ public class TTS_DeckBuilder extends Application implements EventHandler<ActionE
     
     Rectangle2D primaryScreenBounds = Screen.getPrimary().getVisualBounds();
     private final double DPI = Screen.getPrimary().getDpi();
+    private final int MAXIMUM_NUMBER_OF_CARDS = 70;
     private final KeyCombination kcombo_ControlV = new KeyCodeCombination(KeyCode.V, KeyCombination.CONTROL_DOWN);
     private final KeyCombination kcombo_Enter = new KeyCodeCombination(KeyCode.ENTER);
     
@@ -57,7 +58,7 @@ public class TTS_DeckBuilder extends Application implements EventHandler<ActionE
     
     TextField tvDeckName;
     
-    ArrayList<Image> imageList = new ArrayList();
+    Deck cardDeck = new Deck();
     
     Button button;
     Stage window;
@@ -178,7 +179,7 @@ public class TTS_DeckBuilder extends Application implements EventHandler<ActionE
         
         button_Settings.setOnAction(e ->{
             System.out.println("Settings clicked.");
-           changeSettings(); 
+            changeSettings(); 
         });
         
         VBox topMenu = new VBox();
@@ -294,10 +295,10 @@ public class TTS_DeckBuilder extends Application implements EventHandler<ActionE
             ivPrevious2.setImage(ivPrevious.getImage());
             ivPrevious.setImage(ivCurrent.getImage());
             ivCurrent.setImage(null);
-            cardCounter.setText("Cards Added: " + imageList.size());
+            cardCounter.setText("Cards Added: " + cardDeck.size());
             cardImage = null;
             ++currentIndex;
-            if(currentIndex == 70){
+            if(currentIndex == MAXIMUM_NUMBER_OF_CARDS){
                 makeNodeInactive(button_AddToDeck);
                 makeNodeInactive(button_GrabClipboard);
                 statusMessage.setText("Maximum cards added. No further cards may be added.");
@@ -339,8 +340,9 @@ public class TTS_DeckBuilder extends Application implements EventHandler<ActionE
     
     //***   Add the current image to the list by taking a Snapshot of the imageView   ***
     public void addImage(Image i){
-        Image imageToAdd = scaleImage(i, cardWidth, cardHeight);
-        imageList.add(imageToAdd);
+//        Image imageToAdd = scaleImage(i, cardWidth, cardHeight);
+//        cardDeck.add(imageToAdd);
+        cardDeck.addCard(new Card(i));
     }
     
     //***   Handle unknown ActionEvent events   ***
@@ -361,6 +363,9 @@ public class TTS_DeckBuilder extends Application implements EventHandler<ActionE
     
     public void exportDeck(Text statusMessage){
         String exportFileName = "Error Exporting";
+        
+        cardDeck.resizeCards(cardWidth, cardHeight);
+        
         Canvas deckCanvas = new Canvas(canvasWidth, canvasHeight);
         GraphicsContext temporaryCanvas = deckCanvas.getGraphicsContext2D();
         temporaryCanvas.setFill(Color.BLACK);
@@ -371,9 +376,9 @@ public class TTS_DeckBuilder extends Application implements EventHandler<ActionE
         
         //Maximum of 70 cards per deck-image.
         //Maybe implement custom number.
-        for(int i = 1; i < (imageList.size() + 1) && i < 70; ++i){
+        for(int i = 1; i < (cardDeck.size() + 1) && i < MAXIMUM_NUMBER_OF_CARDS; ++i){
             
-            temporaryCanvas.drawImage((Image)imageList.get(i - 1), xPadding, yPadding);
+            temporaryCanvas.drawImage((Image)cardDeck.getCardAtIndex(i - 1).getImage(), xPadding, yPadding);
 
             xPadding+= totalCardWidthWithPadding();
             
@@ -388,23 +393,18 @@ public class TTS_DeckBuilder extends Application implements EventHandler<ActionE
             WritableImage exportImage = new WritableImage(canvasWidth, canvasHeight);
             WritableImage snapshot = deckCanvas.snapshot(new SnapshotParameters(), exportImage);
             
-            exportFileName = "TTS_Deck_" + new Date().getTime() + "_" + imageList.size() + "cards";
-            String deckName = tvDeckName.getText();
-            deckName = deckName.replaceAll(" ", "");
-            deckName = deckName.replaceAll("\"", "\\\"");
-            deckName = deckName.trim();
-            if(!deckName.isEmpty()){
-                exportFileName = deckName + "_" + imageList.size() + "cards";
-            }
+            String nameSnippet = cardDeck.getDeckName() == null ? "" + new Date().getTime() : cardDeck.getDeckName();
+            exportFileName = "TTS_Deck_" + nameSnippet + "_" + cardDeck.size() + "cards.png";
+    
             
-            File output = new File(exportFileName + ".png");
+            File output = new File(exportFileName);
             ImageIO.write(SwingFXUtils.fromFXImage(snapshot, null), "png", output);
         }
         catch(IOException e){
             System.err.println(e.getMessage());
         }
         
-        statusMessage.setText("Exported to " + exportFileName + ".png");
+        statusMessage.setText("Exported to " + exportFileName);
         statusMessage.setVisible(true);
     }
     
@@ -425,28 +425,5 @@ public class TTS_DeckBuilder extends Application implements EventHandler<ActionE
         cardWidth = controller.getCardWidth();
         cardHeight = controller.getCardHeight();
         cardPadding = controller.getCardPadding();
-    }
-    
-    /**
-     * Scale passed image to desired desired width and height.
-     * @param iTS
-     * @param dWidth
-     * @param dHeight
-     * @return 
-     */
-    public static Image scaleImage(Image iTS, int dWidth, int dHeight){
-        Image outputImage = null;
-        BufferedImage oImage = null;
-        BufferedImage imageToScale = SwingFXUtils.fromFXImage(iTS, null);
-        
-        if(imageToScale != null){
-            oImage = new BufferedImage(dWidth, dHeight, imageToScale.getType());
-            Graphics2D g2D = oImage.createGraphics();
-            g2D.drawImage(imageToScale, 0, 0, dWidth, dHeight, null);
-            g2D.dispose();
-        }
-        
-        outputImage = SwingFXUtils.toFXImage(oImage, null);
-        return outputImage;
-    }
+    }    
 }

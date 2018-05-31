@@ -5,11 +5,11 @@ package tts_deckbuilder;
  * @author Jackson
  */
 public class Controller {
-    private final int CANVAS_WIDTH_DEFAULT = 3320;
-    private final int CANVAS_HEIGHT_DEFAULT = 3255;
-    private final int CARD_WIDTH_DEFAULT = 312;
+        private final int CARD_WIDTH_DEFAULT = 312;
     private final int CARD_HEIGHT_DEFAULT = 445;
-    private final int CARD_PADDING_DEFAULT = 10;
+    private final int CARD_OUTLINE_THICKNESS_DEFAULT = 10;
+    private final int CANVAS_WIDTH_DEFAULT = 10 * ((2 * CARD_OUTLINE_THICKNESS_DEFAULT) + CARD_WIDTH_DEFAULT);
+    private final int CANVAS_HEIGHT_DEFAULT = 10 * ((2 * CARD_OUTLINE_THICKNESS_DEFAULT) + CARD_HEIGHT_DEFAULT);
     
     private int canvasWidth, canvasHeight, cardWidth, cardHeight, cardPadding;
     
@@ -18,7 +18,7 @@ public class Controller {
         canvasHeight =CANVAS_HEIGHT_DEFAULT;
         cardWidth = CARD_WIDTH_DEFAULT;
         cardHeight = CARD_HEIGHT_DEFAULT;
-        cardPadding = CARD_PADDING_DEFAULT;
+        cardPadding = CARD_OUTLINE_THICKNESS_DEFAULT;
     }
     
     public void restoreDefaults(){
@@ -26,7 +26,7 @@ public class Controller {
         canvasHeight =CANVAS_HEIGHT_DEFAULT;
         cardWidth = CARD_WIDTH_DEFAULT;
         cardHeight = CARD_HEIGHT_DEFAULT;
-        cardPadding = CARD_PADDING_DEFAULT;
+        cardPadding = CARD_OUTLINE_THICKNESS_DEFAULT;
     }
     
     public void setCanvasWidth(int i){canvasWidth = i;}

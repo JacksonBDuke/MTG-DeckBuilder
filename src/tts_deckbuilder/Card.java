@@ -1,5 +1,8 @@
 package tts_deckbuilder;
 
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.Image;
 
 /**
@@ -34,8 +37,23 @@ public class Card {
         return cardDescription;
     }
     
-    public void resizeImage(int width, int height){
+    /**
+     * Scale passed image to desired width and height.
+     * @param width
+     * @param height
+     */
+    public void scaleImage(int width, int height){
+        BufferedImage tempImage = null;
+        BufferedImage imageToScale = SwingFXUtils.fromFXImage(cardImage, null);
         
+        if(imageToScale != null){
+            tempImage = new BufferedImage(width, height, imageToScale.getType());
+            Graphics2D g2D = tempImage.createGraphics();
+            g2D.drawImage(imageToScale, 0, 0, width, height, null);
+            g2D.dispose();
+        }
+        
+        cardImage = SwingFXUtils.toFXImage(tempImage, null);
     }
     
     public void resizeImageWidth(int width, boolean conserveAspectRatio){
@@ -46,7 +64,7 @@ public class Card {
         else{
             // set to existing height
         }
-        resizeImage(width, height);
+        scaleImage(width, height);
     }
     
     public void resizeImageHeight(int height, boolean conserveAspectRatio){
@@ -57,6 +75,6 @@ public class Card {
         else{
             // set to existing width
         }
-        resizeImage(width, height);
+        scaleImage(width, height);
     }
 }
