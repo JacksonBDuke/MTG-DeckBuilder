@@ -1,8 +1,5 @@
 package tts_deckbuilder;
 
-import java.awt.Graphics2D;
-import java.awt.image.BufferedImage;
-import java.util.ArrayList;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -44,6 +41,7 @@ public class TTS_DeckBuilder extends Application implements EventHandler<ActionE
     Rectangle2D primaryScreenBounds = Screen.getPrimary().getVisualBounds();
     private final double DPI = Screen.getPrimary().getDpi();
     private final int MAXIMUM_NUMBER_OF_CARDS = 70;
+    private final Color BG_COLOR = Color.web("#FEFEFE");
     private final KeyCombination kcombo_ControlV = new KeyCodeCombination(KeyCode.V, KeyCombination.CONTROL_DOWN);
     private final KeyCombination kcombo_Enter = new KeyCodeCombination(KeyCode.ENTER);
     
@@ -94,11 +92,7 @@ public class TTS_DeckBuilder extends Application implements EventHandler<ActionE
         
         System.out.println(DPI);
         
-        canvasWidth = controller.getCanvasWidth();
-        canvasHeight = controller.getCanvasHeight();
-        cardWidth = controller.getCardWidth();
-        cardHeight = controller.getCardHeight();
-        cardPadding = controller.getCardPadding();
+        updateValues();
         
         //window.setOnCloseRequest(e -> closeProgram());
         window = primaryStage;
@@ -106,35 +100,87 @@ public class TTS_DeckBuilder extends Application implements EventHandler<ActionE
         
         cardImage = previousImage = previousImage2 = null;
         
-        ivCurrent = new ImageView();
-        ivPrevious = new ImageView();
-        ivPrevious2 = new ImageView();
+        
         tvDeckName = new TextField();
         
         cardCounter = new Text("No cards added");
         statusMessage = new Text();
         
-        cardCounter.setFill(Color.web("#FEFEFE"));
-        statusMessage.setFill(Color.web("#FEFEFE"));
+        cardCounter.setFill(BG_COLOR);
+        statusMessage.setFill(BG_COLOR);
         
-        ivCurrent.setFitWidth(cardWidth);
-        ivCurrent.setFitHeight(cardHeight);
-        ivCurrent.setPreserveRatio(false);
-        ivCurrent.setSmooth(true);
-        ivCurrent.setCache(true);
+        addImageViews();
         
-        ivPrevious.setFitWidth(cardWidth);
-        ivPrevious.setFitHeight(cardHeight);
-        ivPrevious.setPreserveRatio(false);
-        ivPrevious.setSmooth(true);
-        ivPrevious.setCache(true);
+        addButtons();
+        setButtonActions();      
         
-        ivPrevious2.setFitWidth(cardWidth);
-        ivPrevious2.setFitHeight(cardHeight);
-        ivPrevious2.setPreserveRatio(false);
-        ivPrevious2.setSmooth(true);
-        ivPrevious2.setCache(true);
         
+        VBox topMenu = new VBox();
+        VBox leftMenu = new VBox();
+        VBox rightMenu = new VBox();
+        HBox bottomMenu = new HBox();
+        HBox centerContent = new HBox();
+        
+        centerContent.setSpacing(3.0);
+        
+        VBox currentCardBox = new VBox();
+        currentCardBox.autosize();
+        currentCardBox.setAlignment(Pos.CENTER);
+        
+        VBox previousCardBox = new VBox();
+        previousCardBox.autosize();
+        previousCardBox.setAlignment(Pos.CENTER);
+        
+        VBox previousCardBox2 = new VBox();
+        previousCardBox2.autosize();
+        previousCardBox2.setAlignment(Pos.CENTER);
+        
+        currentText = new Text("Current Card");
+        currentText.setFill(BG_COLOR);
+        lastText = new Text("Last Added");
+        lastText.setFill(BG_COLOR);
+        previousText = new Text("Previous Added");
+        previousText.setFill(BG_COLOR);
+        
+        tvDeckName.setAlignment(Pos.CENTER);
+        tvDeckName.autosize();
+        tvDeckName.setDisable(true);
+        tvDeckName.setPromptText("Enter Custom Deck Name");
+        
+        currentCardBox.getChildren().addAll(ivCurrent, currentText);
+        previousCardBox.getChildren().addAll(ivPrevious, lastText);
+        previousCardBox2.getChildren().addAll(ivPrevious2, previousText);
+        
+        //*** Set menu contents ***
+        topMenu.getChildren().addAll(cardCounter, statusMessage);
+        bottomMenu.getChildren().addAll(button_Settings, button_GrabClipboard, button_AddToDeck, button_Export);
+        //leftMenu.getChildren().addAll(button_PreviousCard);
+        //rightMenu.getChildren().addAll(button_NextCard);
+        
+        centerContent.getChildren().addAll(previousCardBox2, previousCardBox, currentCardBox);
+        centerContent.setAlignment(Pos.CENTER);
+        
+        topMenu.setAlignment(Pos.TOP_CENTER);
+        bottomMenu.setAlignment(Pos.BOTTOM_CENTER);
+        
+        BorderPane borderPane = new BorderPane( centerContent, topMenu, null, bottomMenu, null);
+        BorderPane.setAlignment(borderPane.getBottom(), Pos.BOTTOM_CENTER);
+        borderPane.autosize();
+        
+        scene1 = new Scene(borderPane);
+        scene1.getAccelerators().put(kcombo_ControlV, (Runnable) () -> {
+            setCurrentImageToClipboardContents();
+        });
+        scene1.getAccelerators().put(kcombo_Enter, (Runnable) () -> {
+            addToDeck(); 
+        });
+        window.setScene(scene1);
+        scene1.getStylesheets().add(TTS_DeckBuilder.class.getResource("Dark.css").toExternalForm());
+        window.setTitle("TTS Deck Builder");
+        window.show();
+    }
+    
+    private void addButtons(){
         button_GrabClipboard = new Button("Grab from Clipboard");
         
         button_AddToDeck = new Button("Add Card to Deck");
@@ -150,7 +196,9 @@ public class TTS_DeckBuilder extends Application implements EventHandler<ActionE
         button_NextCard.setDisable(true);
         
         button_Settings = new Button("Settings");
-        
+    }
+    
+    private void setButtonActions(){
         button_GrabClipboard.setOnAction(e -> {
             System.out.println("Grab from Clipboard clicked.");
             setCurrentImageToClipboardContents();
@@ -181,74 +229,30 @@ public class TTS_DeckBuilder extends Application implements EventHandler<ActionE
             System.out.println("Settings clicked.");
             changeSettings(); 
         });
+    }
+    
+    private void addImageViews(){
+        ivCurrent = new ImageView();
+        ivPrevious = new ImageView();
+        ivPrevious2 = new ImageView();
         
-        VBox topMenu = new VBox();
-        VBox leftMenu = new VBox();
-        VBox rightMenu = new VBox();
-        HBox bottomMenu = new HBox();
-        HBox centerContent = new HBox();
+        ivCurrent.setFitWidth(cardWidth);
+        ivCurrent.setFitHeight(cardHeight);
+        ivCurrent.setPreserveRatio(false);
+        ivCurrent.setSmooth(true);
+        ivCurrent.setCache(true);
         
-        centerContent.setSpacing(3.0);
+        ivPrevious.setFitWidth(cardWidth);
+        ivPrevious.setFitHeight(cardHeight);
+        ivPrevious.setPreserveRatio(false);
+        ivPrevious.setSmooth(true);
+        ivPrevious.setCache(true);
         
-        VBox currentCardBox = new VBox();
-        currentCardBox.autosize();
-        currentCardBox.setAlignment(Pos.CENTER);
-        
-        VBox previousCardBox = new VBox();
-        previousCardBox.autosize();
-        previousCardBox.setAlignment(Pos.CENTER);
-        
-        VBox previousCardBox2 = new VBox();
-        previousCardBox2.autosize();
-        previousCardBox2.setAlignment(Pos.CENTER);
-        
-        currentText = new Text("Current Card");
-        currentText.setFill(Color.web("#FEFEFE"));
-        lastText = new Text("Last Added");
-        lastText.setFill(Color.web("#FEFEFE"));
-        previousText = new Text("Previous Added");
-        previousText.setFill(Color.web("#FEFEFE"));
-        
-        tvDeckName.setAlignment(Pos.CENTER);
-        tvDeckName.autosize();
-        tvDeckName.setDisable(true);
-        tvDeckName.setPromptText("Enter Custom Deck Name");
-        
-        currentCardBox.getChildren().addAll(ivCurrent, currentText);
-        previousCardBox.getChildren().addAll(ivPrevious, lastText);
-        previousCardBox2.getChildren().addAll(ivPrevious2, previousText);
-        
-        //*** Set menu contents ***
-        topMenu.getChildren().addAll(cardCounter, statusMessage);
-        bottomMenu.getChildren().addAll(button_Settings, button_GrabClipboard, button_AddToDeck, button_Export);
-        //leftMenu.getChildren().addAll(button_PreviousCard);
-        //rightMenu.getChildren().addAll(button_NextCard);
-        
-        centerContent.getChildren().addAll(previousCardBox2, previousCardBox, currentCardBox);
-        centerContent.setAlignment(Pos.CENTER);
-        
-        topMenu.setAlignment(Pos.TOP_CENTER);
-        bottomMenu.setAlignment(Pos.BOTTOM_CENTER);
-        
-        BorderPane borderPane = new BorderPane( centerContent, topMenu, null, bottomMenu, null);
-        BorderPane.setAlignment(borderPane.getBottom(), Pos.BOTTOM_CENTER);
-        borderPane.autosize();
-        
-        scene1 = new Scene(borderPane);
-        scene1.getAccelerators().put(kcombo_ControlV, new Runnable(){
-            @Override public void run(){
-                setCurrentImageToClipboardContents();
-            }
-        });
-        scene1.getAccelerators().put(kcombo_Enter, new Runnable(){
-           @Override public void run(){
-               addToDeck();
-           } 
-        });
-        window.setScene(scene1);
-        scene1.getStylesheets().add(TTS_DeckBuilder.class.getResource("Dark.css").toExternalForm());
-        window.setTitle("TTS Deck Builder");
-        window.show();
+        ivPrevious2.setFitWidth(cardWidth);
+        ivPrevious2.setFitHeight(cardHeight);
+        ivPrevious2.setPreserveRatio(false);
+        ivPrevious2.setSmooth(true);
+        ivPrevious2.setCache(true);
     }
     
     //***   Decrement currentIndex, adjust displayed cards [NOT IMPLEMENTED] ***

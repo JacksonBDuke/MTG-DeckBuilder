@@ -27,6 +27,8 @@ public class OptionsMenu {
     private static TextField tf_CardHeight;
     private static TextField tf_CardPadding;
     
+    private static final Color BG_COLOR = Color.web("#FEFEFE");
+    
     private static final Text TEXT_OPTIONS = new Text("Settings can not be changed after you add cards!");
     private static final Text TEXT_CANVAS_WIDTH = new Text("Canvas Width: ");
     private static final Text TEXT_CANVAS_HEIGHT = new Text("Canvas Height: ");
@@ -43,12 +45,7 @@ public class OptionsMenu {
         cardHeight = theController.getCardHeight();
         cardPadding = theController.getCardPadding();
         
-        TEXT_OPTIONS.setFill(Color.web("#FEFEFE"));
-        TEXT_CANVAS_WIDTH.setFill(Color.web("#FEFEFE"));
-        TEXT_CANVAS_HEIGHT.setFill(Color.web("#FEFEFE"));
-        TEXT_CARD_WIDTH.setFill(Color.web("#FEFEFE"));
-        TEXT_CARD_HEIGHT.setFill(Color.web("#FEFEFE"));
-        TEXT_CARD_PADDING.setFill(Color.web("#FEFEFE"));
+        setTextViewBackgroundColor(BG_COLOR);
         
         tf_CanvasWidth = new TextField("" + canvasWidth);
         tf_CanvasHeight = new TextField("" + canvasHeight);
@@ -174,13 +171,7 @@ public class OptionsMenu {
         
         button_RestoreDefaults.setOnAction(e->{
             restoreDefaults();
-            
-            canvasWidth = theController.getCanvasWidth();
-            canvasHeight = theController.getCanvasHeight();
-            cardWidth = theController.getCardWidth();
-            cardHeight = theController.getCardHeight();
-            cardPadding = theController.getCardPadding();
-            
+            updateValues();            
             refreshDisplayedValues();
         });
         
@@ -200,6 +191,15 @@ public class OptionsMenu {
         window.showAndWait();
     }
     
+    private static void setTextViewBackgroundColor(Color c){
+        TEXT_OPTIONS.setFill(c);
+        TEXT_CANVAS_WIDTH.setFill(c);
+        TEXT_CANVAS_HEIGHT.setFill(c);
+        TEXT_CARD_WIDTH.setFill(c);
+        TEXT_CARD_HEIGHT.setFill(c);
+        TEXT_CARD_PADDING.setFill(c);
+    }
+    
     public static void applySettings(){
         System.out.println("Settings>Apply clicked.");
         theController.setCanvasHeight(canvasHeight);
@@ -213,6 +213,17 @@ public class OptionsMenu {
         System.out.println("Settings>Restore Defaults clicked.");
         theController.restoreDefaults();
     }
+    
+    /**
+     * Update the local values for the card and canvas from the Controller class.
+     */
+    public static void updateValues(){
+        canvasWidth = theController.getCanvasWidth();
+        canvasHeight = theController.getCanvasHeight();
+        cardWidth = theController.getCardWidth();
+        cardHeight = theController.getCardHeight();
+        cardPadding = theController.getCardPadding();
+    }    
     
     public static void refreshDisplayedValues(){
         tf_CanvasWidth.setText("" + canvasWidth);

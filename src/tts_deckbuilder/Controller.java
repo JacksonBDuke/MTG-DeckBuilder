@@ -5,7 +5,7 @@ package tts_deckbuilder;
  * @author Jackson
  */
 public class Controller {
-        private final int CARD_WIDTH_DEFAULT = 312;
+    private final int CARD_WIDTH_DEFAULT = 312;
     private final int CARD_HEIGHT_DEFAULT = 445;
     private final int CARD_OUTLINE_THICKNESS_DEFAULT = 10;
     private final int CANVAS_WIDTH_DEFAULT = 10 * ((2 * CARD_OUTLINE_THICKNESS_DEFAULT) + CARD_WIDTH_DEFAULT);
